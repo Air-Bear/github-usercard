@@ -1,8 +1,21 @@
+// const axios = require("axios");
+const cardDiv = document.getElementsByClassName("cards");
+
+
 /*
   STEP 1: using axios, send a GET request to the following URL
     (replacing the placeholder with your Github name):
     https://api.github.com/users/<your name>
 */
+
+axios.get("https://api.github.com/users/Air-Bear/followers").then(response => {
+  response.data.forEach(followerInfo => {
+    axios.get(followerInfo.url).then((response)=>{
+      cardDiv[0].append(cardMaker(response.data));
+    });
+  });
+});
+
 
 /*
   STEP 2: Inspect and study the data coming back, this is YOUR
@@ -28,7 +41,16 @@
     user, and adding that card to the DOM.
 */
 
-const followersArray = [];
+const url = "https://api.github.com/users/";
+const followersArray = ["tetondan", "dustinmyers", "justsml", "luishrd", "bigknell"];
+
+followersArray.forEach((instruct, i) => {
+  axios.get(url + followersArray[i]).then(response => {
+    axios.get(response.data.url).then(response => {
+      cardDiv[0].append(cardMaker(response.data)); 
+    });
+  });
+});
 
 /*
   STEP 3: Create a function that accepts a single object as its only argument.
@@ -49,6 +71,55 @@ const followersArray = [];
       </div>
     </div>
 */
+
+const proxyURL = "https://cors-anywhere.herokuapp.com/";
+const contributeURL = "https://github.com/users/Air-Bear/contributions";
+axios.get(proxyURL + contributeURL).then(response => {
+  cardDiv[0].insertAdjacentHTML("afterbegin", response.data);
+});
+
+function cardMaker(obj){
+  const div = document.createElement("div");
+  const img = document.createElement("img");
+  const divInfo = document.createElement("div");
+  const name = document.createElement("h3");
+  const userName = document.createElement("p");
+  const location = document.createElement("p");
+  const profileLink = document.createElement("p");
+  const link = document.createElement("a");
+  const followers = document.createElement("p");
+  const following = document.createElement("p");
+  const bio = document.createElement("p");
+
+  div.classList.add("card");
+  divInfo.classList.add("card-info");
+  name.classList.add("name");
+  userName.classList.add("username");
+
+  img.src = obj.avatar_url;
+  name.textContent = obj.name;
+  userName.textContent = obj.login;
+  location.textContent = obj.location;
+  link.href = obj.html_url;
+  followers.textContent = "Followers: " + obj.followers;
+  following.textContent = "Following: " + obj.following;
+  bio.textContent = "Bio: " + obj.bio; 
+
+  div.append(img);
+  div.append(divInfo);
+  divInfo.append(name);
+  divInfo.append(userName);
+  divInfo.append(location);
+  divInfo.append(profileLink);
+  profileLink.append(link);
+  divInfo.append(followers);
+  divInfo.append(following);
+  divInfo.append(bio);
+
+  return div;
+}
+
+
 
 /*
   List of LS Instructors Github username's:
